@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+__pycache__/
+*.pyc
+.env
+logs/*.log
+models/adapters/
+models/ollama/
+.venv/
+venv/
+.ipynb_checkpoints/
