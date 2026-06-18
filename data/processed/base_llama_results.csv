@@ -1,0 +1,11 @@
+title,category,actual,predicted,absolute_error,percentage_error,within_20_percent
+Excess V2 Distortion/Modulation Pedal,Music Pedals,120.0,245.0,125.0,1.0416666666666667,False
+Telpo Headlight Assembly for 2015‑2017 Toyota Camry,Automotive Accessories,300.0,95.0,205.0,0.6833333333333333,False
+NewPower99 6000 mAh Battery Replacement Kit for Samsung Galaxy Tab S3 9.7,Electronics,43.0,85.0,42.0,0.9767441860465116,False
+EXMAX NG-10X Fresnel Lens Focusing Adapter,Lighting Accessories,55.0,120.0,65.0,1.1818181818181819,False
+Raven Pro Document Scanner Stand,Accessories,12.0,540.0,528.0,44.0,False
+UPC RBC12-UPC Replacement Battery Cartridge,Electronics,220.0,235.0,15.0,0.06818181818181818,True
+"Lexmark X651 Compatible Toner Cartridge – Black, 1 Pack",Office Supplies,25.0,4300.0,4275.0,171.0,False
+ACDelco GM FW339 Front Wheel Hub & Bearing Assembly,Automotive Parts,80.0,85.0,5.0,0.0625,True
+Dryer Heating Element & Thermostat/Fuse Kit,Electronics,30.0,425.0,395.0,13.166666666666666,False
+High‑Efficiency Twin‑Cylinder Air Compressor Pump Head,Industrial Equipment,60.0,840.0,780.0,13.0,False
