@@ -1,0 +1,119 @@
+# Cell 1: Install dependencies
+
+
+!pip install -U unsloth
+!pip install -U datasets transformers trl peft accelerate bitsandbytes
+
+
+# Cell 2: Train LoRA adapter
+
+
+from datasets import load_dataset
+from unsloth import FastLanguageModel
+from trl import SFTTrainer
+from transformers import TrainingArguments
+
+BASE_MODEL_NAME = "unsloth/Llama-3.2-3B-Instruct-bnb-4bit"
+OUTPUT_DIR = "product_price_lora"
+MAX_SEQ_LENGTH = 2048
+
+dataset = load_dataset(
+    "json",
+    data_files={
+        "train": "train.jsonl",
+        "validation": "validation.jsonl",
+    },
+)
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name=BASE_MODEL_NAME,
+    max_seq_length=MAX_SEQ_LENGTH,
+    dtype=None,
+    load_in_4bit=True,
+)
+
+# Explicitly set the chat template for Llama-3
+tokenizer.chat_template = (
+    "{% for message in messages %}"
+        "{% if message['role'] == 'user' %}"
+            "{{ '<|start_header_id|>user<|end_header_id|>\n' + message['content'] | trim + '<|eot_id|>' }}"
+        "{% elif message['role'] == 'system' %}"
+            "{{ '<|start_header_id|>system<|end_header_id|>\n' + message['content'] | trim + '<|eot_id|>' }}"
+        "{% elif message['role'] == 'assistant' %}"
+            "{{ '<|start_header_id|>assistant<|end_header_id|>\n' + message['content'] | trim + '<|eot_id|>' }}"
+        "{% endif %}"
+    "{% endfor %}"
+    "{% if add_generation_prompt %}"
+        "{{ '<|start_header_id|>assistant<|end_header_id|>\n' }}"
+    "{% endif %}"
+)
+
+model = FastLanguageModel.get_peft_model(
+    model,
+    r=16,
+    target_modules=[
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+    ],
+    lora_alpha=16,
+    lora_dropout=0,
+    bias="none",
+    use_gradient_checkpointing="unsloth",
+    random_state=42,
+)
+
+# Define a formatting function for chat data
+def formatting_func(examples):
+    outputs = []
+    for i in range(len(examples["messages"])):
+        conversation = examples["messages"][i]
+        # Apply the chat template to each conversation
+        # tokenize=False returns the string directly.
+        # add_generation_prompt=False ensures we are training the assistant's response.
+        formatted_text = tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=False)
+        outputs.append(formatted_text)
+    return outputs # Changed from {"text": outputs} to outputs
+
+trainer = SFTTrainer(
+    model=model,
+    tokenizer=tokenizer,
+    train_dataset=dataset["train"],
+    eval_dataset=dataset["validation"],
+    # Removed dataset_text_field as formatting_func handles it
+    formatting_func=formatting_func, # Added the custom formatting function
+    max_seq_length=MAX_SEQ_LENGTH,
+    args=TrainingArguments(
+        output_dir=OUTPUT_DIR,
+        per_device_train_batch_size=2,
+        gradient_accumulation_steps=4,
+        warmup_steps=5,
+        num_train_epochs=1,
+        learning_rate=2e-4,
+        logging_steps=10,
+        save_steps=50,
+        eval_steps=50,
+        eval_strategy="steps",
+        save_strategy="steps",
+        fp16=True,
+        optim="adamw_8bit",
+        seed=42,
+        report_to="none",
+        dataloader_num_workers=0, # Added to try to resolve PicklingError
+    ),
+)
+
+trainer.train()
+
+model.save_pretrained(OUTPUT_DIR)
+tokenizer.save_pretrained(OUTPUT_DIR)
+
+
+# Cell 3: Zip adapter
+
+
+!zip -r product_price_lora.zip product_price_lora
