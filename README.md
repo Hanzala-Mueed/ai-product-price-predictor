@@ -303,6 +303,35 @@ llama3.2:latest
 
 ---
 
+# modelfile 
+create folder a\ models/ollama
+create a file with name: Modelfile
+add this content to this file:
+
+```bash
+
+FROM ../hf/product_price_predictor/product_price_predictor_gguf
+
+SYSTEM """
+You are an AI product price prediction assistant.
+
+Estimate the realistic US marketplace price of the product.
+
+Rules:
+- Respond only with one price number.
+- Do not include a dollar sign.
+- Do not include explanation.
+- Round to the nearest dollar.
+"""
+
+PARAMETER temperature 0
+PARAMETER top_p 0.1
+PARAMETER num_predict 20
+
+```
+
+---
+
 # Base Model Setup
 
 Create the base custom model:
