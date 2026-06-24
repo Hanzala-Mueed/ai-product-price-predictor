@@ -1,5 +1,10 @@
 import requests
-from config.settings import OLLAMA_BASE_URL, OLLAMA_MODEL
+# from config.settings import OLLAMA_BASE_URL, OLLAMA_MODEL
+from config.settings import (
+    OLLAMA_BASE_URL,
+    OLLAMA_MODEL,
+    OLLAMA_REQUEST_TIMEOUT,
+)
 from config.logging_config import setup_logging
 
 logger = setup_logging()
@@ -42,12 +47,18 @@ class OllamaClient:
                 "model": self.model,
                 "prompt": prompt,
                 "stream": False,
+                "options": {
+                    "temperature": 0,
+                    # "top_p": 0.1,
+                    "num_predict": 3,
+                    # "stop": ["\n", "$"],
+                },
             }
 
             if system_prompt:
                 payload["system"] = system_prompt
 
-            response = requests.post(self.generate_url, json=payload, timeout=120)
+            response = requests.post(self.generate_url, json=payload, timeout=OLLAMA_REQUEST_TIMEOUT)
             response.raise_for_status()
 
             result = response.json().get("response", "").strip()

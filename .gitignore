@@ -226,3 +226,70 @@ models/ollama/
 .venv/
 venv/
 .ipynb_checkpoints/
+
+
+
+# ==========================================
+# Python
+# ==========================================
+*.pyo
+*.pyd
+
+# ==========================================
+# Virtual Environment
+# ==========================================
+venv/
+.venv/
+
+# ==========================================
+# Logs
+# ==========================================
+logs/
+*.log
+
+# ==========================================
+# Streamlit
+# ==========================================
+.streamlit/
+
+# ==========================================
+# Model Artifacts
+# ==========================================
+models/adapters/**
+models/hf/**
+
+# Keep folder structure
+!models/adapters/.gitkeep
+!models/hf/.gitkeep
+
+# GGUF
+*.gguf
+
+# HuggingFace checkpoints
+*.safetensors
+*.bin
+
+# Large tokenizer files
+tokenizer.json
+tokenizer_config.json
+generation_config.json
+config.json
+
+# ==========================================
+# Training Outputs
+# ==========================================
+checkpoint-*/
+runs/
+output/
+outputs/
+
+# ==========================================
+# Dataset Artifacts
+# ==========================================
+data/processed/*.csv
+
+# ==========================================
+# IDE
+# ==========================================
+.vscode/
+.idea/

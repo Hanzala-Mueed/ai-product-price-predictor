@@ -1,58 +1,75 @@
 # AI Product Price Predictor
 
-## Overview
+## Version 2.0.0
 
-AI Product Price Predictor is an end-to-end machine learning and Large Language Model (LLM) portfolio project that estimates the market price of products using local AI models powered by Ollama.
+AI Product Price Predictor is an end-to-end AI Engineering portfolio project that estimates realistic product prices using local Large Language Models (LLMs) powered by Ollama.
 
-The project combines:
+The project demonstrates the complete lifecycle of an AI application:
 
+* Data preparation
 * Product preprocessing
-* Local LLM integration
+* Local LLM inference
 * Price prediction
-* Dataset preparation
-* Model evaluation
-* Streamlit user interface
-* Logging and exception handling
+* LoRA fine-tuning
+* GGUF model export
+* Ollama deployment
+* Model routing
+* Evaluation
+* Streamlit frontend
+* Logging
+* Exception handling
 * Test-driven development
 
-The project is inspired by the Week 6 Product Pricing workflow and is designed to demonstrate practical AI engineering skills suitable for portfolio and GitHub presentation.
+The project is inspired by the Week 6 Product Pricing workflow and extended into a production-style AI system.
 
 ---
 
 # Features
 
-## AI Product Analysis
+## Product Preprocessing
 
-* Product preprocessing using Ollama
+* Product cleaning
 * Product summarization
 * Structured product representation
+* AI-powered preprocessing
 
 ## Price Prediction
 
 * Product price estimation
-* Prediction prompt generation
-* Prediction result extraction
+* Prompt generation
+* Price extraction
+* Prediction validation
+
+## Local AI Inference
+
+* Ollama integration
+* Local model execution
+* Fine-tuned model support
+* GGUF model deployment
+
+## Fine-Tuning Pipeline
+
+* LoRA Fine-Tuning
+* Unsloth Training
+* HuggingFace Transformers
+* PEFT Adapters
+* GGUF Export
+* Ollama Import
 
 ## Evaluation System
 
-* Absolute error calculation
-* Percentage error calculation
-* Accuracy measurement
-* Dataset evaluation
-
-## Local AI
-
-* Ollama integration
-* Llama 3.2 support
-* Custom Ollama model support
+* Absolute Error
+* Percentage Error
+* Accuracy Measurement
+* Model Comparison
 
 ## Software Engineering
 
+* Modular Architecture
 * Logging
-* Exception handling
-* Modular architecture
-* Unit testing
-* GitHub-ready structure
+* Exception Handling
+* Unit Testing
+* GitHub-Friendly Commit Structure
 
 ---
 
@@ -62,11 +79,16 @@ The project is inspired by the Week 6 Product Pricing workflow and is designed t
 
 * Python 3.11+
 
-## AI
+## AI / LLM
 
 * Ollama
 * Llama 3.2
-* LoRA Fine-Tuning (future phase)
+* LoRA Fine-Tuning
+* Unsloth
+* HuggingFace Transformers
+* TRL
+* PEFT
+* GGUF
 
 ## Frontend
 
@@ -83,29 +105,69 @@ The project is inspired by the Week 6 Product Pricing workflow and is designed t
 
 ---
 
-# Project Architecture
+# System Architecture
 
 ```text
 User Input
-    │
-    ▼
-Product Item
-    │
-    ▼
+     │
+     ▼
+Item Builder
+     │
+     ▼
 Preprocessor
-    │
-    ▼
-Ollama Summary
-    │
-    ▼
+(product-price-predictor)
+     │
+     ▼
+Structured Summary
+     │
+     ▼
 Price Predictor
-    │
-    ▼
-Price Evaluation
-    │
-    ▼
+(product-price-predictor-finetuned)
+     │
+     ▼
+Fallback Predictor
+(llama3.2:latest)
+     │
+     ▼
+Price Extraction
+     │
+     ▼
+Evaluation Layer
+     │
+     ▼
 Streamlit UI
 ```
+
+---
+
+# Model Routing Architecture
+
+The project uses different models for different tasks.
+
+```text
+Preprocessing
+      │
+      ▼
+product-price-predictor
+(Base Model)
+
+Prediction
+      │
+      ▼
+product-price-predictor-finetuned
+(Fine-Tuned Model)
+
+Fallback
+      │
+      ▼
+llama3.2:latest
+```
+
+Purpose:
+
+* Base model cleans product data
+* Fine-tuned model predicts prices
+* Fallback model handles prediction failures
 
 ---
 
@@ -117,7 +179,6 @@ ai-product-price-predictor/
 ├── app.py
 ├── README.md
 ├── requirements.txt
-├── .env.example
 ├── .gitignore
 │
 ├── config/
@@ -153,16 +214,26 @@ ai-product-price-predictor/
 │   ├── prepare_finetune_dataset.py
 │   ├── train_lora_unsloth.py
 │   ├── export_to_ollama.py
+│   ├── import_adapter_to_ollama.py
 │   └── README_TRAINING.md
 │
 ├── models/
+│   │
 │   ├── adapters/
+│   │   └── product_price_lora/
+│   │
+│   ├── gguf/
+│   │   └── product_price_predictor.gguf
+│   │
+│   ├── hf/
+│   │   └── product_price_predictor/
+│   │
 │   └── ollama/
-│       └── Modelfile
 │
 ├── scripts/
 │   ├── check_preprocessor.py
 │   ├── check_predictor.py
+│   ├── check_finetuned_model.py
 │   └── evaluate_base_model.py
 │
 ├── logs/
@@ -178,7 +249,7 @@ ai-product-price-predictor/
 ## Clone Repository
 
 ```bash
-git clone <your-repository-url>
+git clone <repository-url>
 cd ai-product-price-predictor
 ```
 
@@ -232,9 +303,9 @@ llama3.2:latest
 
 ---
 
-# Create Custom Ollama Model
+# Base Model Setup
 
-Run:
+Create the base custom model:
 
 ```bash
 python -m training.export_to_ollama
@@ -251,6 +322,141 @@ Expected:
 ```text
 product-price-predictor
 llama3.2:latest
+```
+
+---
+
+# Fine-Tuning Workflow
+
+## Step 1
+
+Generate datasets:
+
+```bash
+python -m training.prepare_finetune_dataset
+```
+
+Creates:
+
+```text
+train.jsonl
+validation.jsonl
+test.jsonl
+```
+
+---
+
+## Step 2
+
+Open Google Colab notebook.
+
+Upload:
+
+```text
+data/processed/train.jsonl
+data/processed/validation.jsonl
+```
+
+Run all notebook cells.
+
+Training uses:
+
+```text
+Unsloth
+Llama 3.2 3B
+LoRA
+Tesla T4 GPU
+```
+
+---
+
+## Step 3
+
+Download:
+
+```text
+product_price_predictor_gguf.zip
+```
+Unzip the folder and
+
+Place product_price_predictor_gguf folder at :
+
+```text
+models/hf/product_price_predictor
+```
+
+---
+
+## Step 4
+
+create the finetuned model using this command:
+
+```bash
+ollama create product-price-predictor-finetuned -f models/ollama/Modelfile
+```
+
+<!-- Import into Ollama:
+
+```bash
+python -m training.import_adapter_to_ollama
+``` -->
+
+Verify:
+
+```bash
+ollama list
+```
+
+Expected:
+
+```text
+product-price-predictor-finetuned
+product-price-predictor
+llama3.2:latest
+```
+
+---
+
+# Fine-Tuning Results
+
+Training Environment:
+
+```text
+Google Colab
+Tesla T4 GPU
+Unsloth
+```
+
+Training Configuration:
+
+```text
+Base Model:
+Llama-3.2-3B-Instruct
+
+LoRA Rank:
+16
+
+LoRA Alpha:
+16
+
+Epochs:
+1
+
+Training Examples:
+80
+
+Validation Examples:
+10
+```
+
+Training Output:
+
+```text
+Training Loss:
+3.28
+
+Validation Loss:
+2.44
 ```
 
 ---
@@ -279,17 +485,17 @@ Run all tests:
 pytest
 ```
 
-Run specific test:
+Run individual test:
 
 ```bash
-pytest tests/test_06_prediction_prompt.py
+pytest tests/test_16_model_routing.py
 ```
 
 ---
 
 # Logging
 
-Application logs are stored in:
+Logs are stored at:
 
 ```text
 logs/app.log
@@ -297,31 +503,31 @@ logs/app.log
 
 Logging includes:
 
-* Information logs
-* Warnings
-* Errors
-* Exception traces
+* INFO
+* WARNING
+* ERROR
+* Exception Stack Traces
 
 Example:
 
 ```text
-2026-06-18 03:53:58 | INFO | predictor.py | Price prediction completed
+2026-06-21 10:29:23 | INFO | predictor.py | Price prediction completed
 ```
 
 ---
 
 # Dataset
 
-The project uses Week 6 product pricing data.
+Based on Week 6 pricing data.
 
-Files:
+Raw Files:
 
 ```text
 data/raw/human_in.csv
 data/raw/human_out.csv
 ```
 
-Processed files:
+Processed Files:
 
 ```text
 data/processed/train.jsonl
@@ -331,98 +537,91 @@ data/processed/test.jsonl
 
 ---
 
-# Fine-Tuning Pipeline
+# Current Models
 
-## Current Status
-
-Current model:
+## Preprocessor
 
 ```text
 product-price-predictor
 ```
 
-is:
+Used for:
 
-```text
-llama3.2 + custom prompt
-```
-
-It is NOT fine-tuned yet.
+* Product cleanup
+* Product summarization
+* Structured product representation
 
 ---
 
-## Future Fine-Tuning
-
-Workflow:
+## Predictor
 
 ```text
-Week 6 Data
-      │
-      ▼
-JSONL Dataset
-      │
-      ▼
-LoRA Training
-      │
-      ▼
-Adapter Export
-      │
-      ▼
-Ollama Import
-      │
-      ▼
-Fine-Tuned Price Predictor
+product-price-predictor-finetuned
 ```
+
+Used for:
+
+* Price estimation
+* Price prediction
 
 ---
 
-# GPU Requirement
+## Fallback
 
-LoRA training requires a GPU.
+```text
+llama3.2:latest
+```
 
-Recommended environments:
+Used when:
 
-* Google Colab
-* Kaggle
-* RunPod
-* Vast.ai
-* Local NVIDIA CUDA GPU
-
-CPU-only systems are not recommended.
+* Fine-tuned model fails
+* Invalid prediction returned
+* Extraction errors occur
 
 ---
 
 # Current Limitations
 
-Because the model is not fine-tuned yet:
+The fine-tuned model was trained on a relatively small dataset.
 
-* Predictions may be unstable
-* Predictions may vary between runs
-* Some products may receive unrealistic prices
-
-Example:
+Training Dataset:
 
 ```text
-Run 1 → $87
-Run 2 → $4200
+80 examples
 ```
 
-This is expected for the baseline model.
+As a result:
+
+* Some predictions remain inaccurate
+* Some product categories are underrepresented
+* Fine-tuned responses may occasionally be invalid
+* Fallback model may be required
+
+Future improvements will focus on larger datasets and stronger evaluation.
 
 ---
 
-# Future Improvements
+# Future Roadmap
 
-## Planned Features
+## Version 2.0
 
-* LoRA Fine-Tuning
-* Adapter Import into Ollama
 * Model Comparison Dashboard
+* Base vs Fine-Tuned Evaluation
+* Error Analysis Reports
+
+## Version 2.1
+
+* Batch Product Prediction
+* CSV Upload Support
 * Prediction History
-* Batch Product Pricing
-* CSV Upload
-* Price Visualization
-* Model Performance Reports
+
+## Version 3.0
+
+* Larger Fine-Tuning Dataset
+* Multi-Model Ensemble
+* Price Confidence Scores
+* Vendor Price Comparison
+* RAG-Based Product Retrieval
 
 ---
 
@@ -433,22 +632,28 @@ This project demonstrates:
 * Python Development
 * Object-Oriented Programming
 * Streamlit Development
-* LLM Integration
+* Local AI Deployment
 * Ollama Integration
+* LLM Engineering
 * Prompt Engineering
-* Dataset Processing
-* AI Evaluation Metrics
-* Logging
+* LoRA Fine-Tuning
+* Unsloth Training
+* GGUF Model Export
+* Fine-Tuned Ollama Deployment
+* Model Routing Architecture
+* Dataset Engineering
+* Evaluation Metrics
+* Logging & Monitoring
 * Exception Handling
-* Test-Driven Development
-* Git Workflow
+* Unit Testing
+* GitHub Workflow
 * Modular Architecture
 
 ---
 
 # Author
 
-Developed as a portfolio project demonstrating practical AI engineering and machine learning deployment skills.
+Developed as an AI Engineering portfolio project demonstrating practical machine learning deployment, local LLM integration, model fine-tuning, and production-style software engineering practices.
 
 ## Project Name
 

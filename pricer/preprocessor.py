@@ -1,4 +1,7 @@
+
+
 from pricer.ollama_client import OllamaClient
+from config.settings import PREPROCESSOR_OLLAMA_MODEL
 from config.logging_config import setup_logging
 
 logger = setup_logging()
@@ -24,7 +27,7 @@ Rules:
 
 class ProductPreprocessor:
     def __init__(self, client: OllamaClient | None = None):
-        self.client = client or OllamaClient()
+        self.client = client or OllamaClient(model=PREPROCESSOR_OLLAMA_MODEL)
 
     def build_user_prompt(self, product_text: str) -> str:
         try:
